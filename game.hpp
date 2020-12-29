@@ -11,6 +11,8 @@
 #include <vector>
 #include <cstdlib>
 #include "lib/physics/particle.h"
+#include "lib/physics/particle_force_registry.h"
+#include "lib/physics/particle_force_generator.h"
 
 #define MAX_VELOCITY 2.0
 

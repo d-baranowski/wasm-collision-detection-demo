@@ -23,6 +23,11 @@ double delta_time = 0.0;
 int diff_time = 0;
 
 auto player_particle = cyclone::Particle();
+auto attached_particle = cyclone::Particle();
+SDL_Rect player_rect;
+auto registry = cyclone::ParticleForceRegistry();
+auto spring = cyclone::ParticleSpring(&player_particle, 0.8, 5);
+auto springTwo = cyclone::ParticleSpring(&attached_particle, 0.8, 5);
 
 void input() {
     if (SDL_PollEvent(&event)) {
@@ -72,7 +77,7 @@ void input() {
                 }
                 break;
             case SDL_MOUSEMOTION: {
-                SDL_MouseMotionEvent *m = (SDL_MouseMotionEvent * ) & event;
+                //SDL_MouseMotionEvent *m = (SDL_MouseMotionEvent * ) & event;
 //                mouse_pos.x = m->x;
 //                mouse_pos.y = m->y;
                 break;
@@ -84,7 +89,9 @@ void input() {
 }
 
 void move(double d) {
+    registry.updateForces(d);
     player_particle.integrate(d);
+    attached_particle.integrate(d);
 }
 
 void render() {
@@ -92,12 +99,19 @@ void render() {
     SDL_RenderClear(renderer);
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // the rect color (solid red)
-    SDL_Rect rect;
-    rect.x = player_particle.getPosition().x;
-    rect.y = player_particle.getPosition().y;
-    rect.w = 10;
-    rect.h = 10;
-    SDL_RenderFillRect(renderer, &rect);
+
+    player_rect.x = player_particle.getPosition().x;
+    player_rect.y = player_particle.getPosition().y;
+    player_rect.w = 10;
+    player_rect.h = 10;
+    SDL_RenderFillRect(renderer, &player_rect);
+
+    player_rect.x = attached_particle.getPosition().x;
+    player_rect.y = attached_particle.getPosition().y;
+    player_rect.w = 10;
+    player_rect.h = 10;
+    SDL_RenderFillRect(renderer, &player_rect);
+
     SDL_RenderPresent(renderer);
 }
 
@@ -111,19 +125,19 @@ void game_loop() {
     input();
 
     if (left_key_down) {
-        player_particle.addForce(cyclone::Vector3(-1, 0, 0) * 100);
+        player_particle.addForce(cyclone::Vector3(-1, 0, 0) * 1000);
     }
 
     if (right_key_down) {
-        player_particle.addForce(cyclone::Vector3(1, 0, 0) * 100);
+        player_particle.addForce(cyclone::Vector3(1, 0, 0) * 1000);
     }
 
     if (up_key_down) {
-        player_particle.addForce(cyclone::Vector3(0, 1, 0) * 100);
+        player_particle.addForce(cyclone::Vector3(0, -1, 0) * 1000);
     }
 
     if (down_key_down) {
-        player_particle.addForce(cyclone::Vector3(0, -1, 0) * 100);
+        player_particle.addForce(cyclone::Vector3(0, 1, 0) * 1000);
     }
 
     move(delta_time);
@@ -131,9 +145,18 @@ void game_loop() {
 }
 
 int main() {
-    player_particle.setPosition(300, 100, 0);
-    player_particle.setMass(1);
-    player_particle.setDamping(0.99);
+    player_particle.setPosition(500, 500, 0);
+    player_particle.setMass(2);
+    player_particle.setDamping(0.98);
+
+    attached_particle.setPosition(200, 200, 0);
+    attached_particle.setMass(0.9);
+    attached_particle.setDamping(0.98);
+
+
+    registry.add(&attached_particle, &spring);
+    registry.add(&player_particle, &springTwo);
+
 
     SDL_Init(SDL_INIT_VIDEO);
 
