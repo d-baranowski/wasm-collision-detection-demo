@@ -10,7 +10,7 @@ class Vector2D {
 private:
 public:
     double x, y;
-    Vector2D(double nX = 0.0, double nY = 0.0);
+    explicit Vector2D(double nX = 0.0, double nY = 0.0);
 
     void SetXY(double nX, double nY);
     void SetDM(double dir, double mag);

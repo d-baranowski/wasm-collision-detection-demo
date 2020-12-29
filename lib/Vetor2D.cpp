@@ -77,6 +77,12 @@ Vector2D Vector2D::operator*(double t) const {
     return (Vector2D(x * t, y * t));
 }
 
+Vector2D& Vector2D::operator*(const Vector2D& v) {
+    x = x * v.x;
+    y = y * v.y;
+    return (*this);
+}
+
 Vector2D Vector2D::operator/(double t) const {
     double f = 1.0 / t;
     return (Vector2D(x * f, y * f));
@@ -109,16 +115,6 @@ Vector2D& Vector2D::Rotate(double angle) {
     return (*this);
 }
 
-Vector2D operator* (double lhs, const Vector2D& rhs)
-{
-    return Vector2D(lhs * rhs.x, lhs * rhs.y);
-}
-
-Vector2D operator/ (double lhs, const Vector2D& rhs)
-{
-    return Vector2D(lhs / rhs.x, lhs / rhs.y);
-}
-
 std::ostream& operator<<(std::ostream& os, const Vector2D& v) {
     os << "(" << v.x << ", " << v.y << ")";
     return os;
@@ -129,4 +125,14 @@ std::istream& operator>>(std::istream& is, Vector2D& v) {
     is >> tX >> tY;
     v.SetXY(tX, tY);
     return is;
+}
+
+Vector2D operator* (double lhs, const Vector2D& rhs)
+{
+    return Vector2D(lhs * rhs.x, lhs * rhs.y);
+}
+
+Vector2D operator/ (double lhs, const Vector2D& rhs)
+{
+    return Vector2D(lhs / rhs.x, lhs / rhs.y);
 }
