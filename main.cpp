@@ -22,12 +22,19 @@ bool space_key_down = false;
 double delta_time = 0.0;
 int diff_time = 0;
 
+auto particleWorld = cyclone::ParticleWorld(100000, 1000000000);
 auto player_particle = cyclone::Particle();
 auto attached_particle = cyclone::Particle();
+
+auto stifflerOne = cyclone::Particle();
+auto stifflerTwo = cyclone::Particle();
+
 SDL_Rect player_rect;
-auto registry = cyclone::ParticleForceRegistry();
 auto spring = cyclone::ParticleSpring(&player_particle, 0.8, 5);
 auto springTwo = cyclone::ParticleSpring(&attached_particle, 0.8, 5);
+
+auto joinOne = new cyclone::ParticleRod();
+auto joinTwo = new cyclone::ParticleRod();
 
 void input() {
     if (SDL_PollEvent(&event)) {
@@ -89,9 +96,7 @@ void input() {
 }
 
 void move(double d) {
-    registry.updateForces(d);
-    player_particle.integrate(d);
-    attached_particle.integrate(d);
+    particleWorld.runPhysics(d);
 }
 
 void render() {
@@ -112,10 +117,24 @@ void render() {
     player_rect.h = 10;
     SDL_RenderFillRect(renderer, &player_rect);
 
+    player_rect.x = stifflerOne.getPosition().x;
+    player_rect.y = stifflerOne.getPosition().y;
+    player_rect.w = 10;
+    player_rect.h = 10;
+    SDL_RenderFillRect(renderer, &player_rect);
+
+    player_rect.x = stifflerTwo.getPosition().x;
+    player_rect.y = stifflerTwo.getPosition().y;
+    player_rect.w = 10;
+    player_rect.h = 10;
+    SDL_RenderFillRect(renderer, &player_rect);
+
     SDL_RenderPresent(renderer);
 }
 
 void game_loop() {
+    particleWorld.startFrame();
+
     current_time = SDL_GetTicks();
 
     diff_time = current_time - last_time;
@@ -153,10 +172,25 @@ int main() {
     attached_particle.setMass(0.9);
     attached_particle.setDamping(0.98);
 
+    particleWorld.addParticle(&player_particle);
+    particleWorld.addParticle(&attached_particle);
 
-    registry.add(&attached_particle, &spring);
-    registry.add(&player_particle, &springTwo);
+    stifflerOne.setPosition(30, 30,0);
+    stifflerTwo.setPosition(60,60, 0);
 
+    //particleWorld.getForceRegistry().add(&attached_particle, &spring);
+    //particleWorld.getForceRegistry().add(&player_particle, &springTwo);
+
+    //particleWorld.addContact(joinTwo);
+    particleWorld.addContact(joinOne);
+
+    joinOne->particle[0] = &player_particle;
+    joinOne->particle[1] = &stifflerOne;
+    joinOne->length = 30;
+
+    joinTwo->particle[0] = &stifflerOne;
+    joinTwo->particle[1] = &stifflerTwo;
+    joinTwo->length = 50;
 
     SDL_Init(SDL_INIT_VIDEO);
 

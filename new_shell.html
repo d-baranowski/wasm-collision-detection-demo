@@ -19,6 +19,7 @@
     preRun: [],
     postRun: [ModuleLoaded],
     print: (function() {
+      console.log("PRINT")
       var element = document.getElementById('output');
       if (element) element.value = ''; // clear browser cache
       return function(text) {

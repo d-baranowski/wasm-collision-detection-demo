@@ -48,3 +48,75 @@ void ParticleSpring::updateForce(Particle *particle, real duration) {
     force *= -magnitude;
     particle->addForce(force);
 }
+
+
+ParticleBungee::ParticleBungee(Particle *other, real sc, real rl)
+        : other(other), springConstant(sc), restLength(rl) {
+}
+
+void ParticleBungee::updateForce(Particle *particle, real duration) {
+    // Calculate the vector of the spring
+    Vector3 force;
+    particle->getPosition(&force);
+    force -= other->getPosition();
+
+    // Check if the bungee is compressed
+    real magnitude = force.magnitude();
+    if (magnitude <= restLength) return;
+
+    // Calculate the magnitude of the force
+    magnitude = springConstant * (restLength - magnitude);
+
+    // Calculate the final force and apply it
+    force.normalise();
+    force *= -magnitude;
+    particle->addForce(force);
+}
+
+
+ParticleBuoyancy::ParticleBuoyancy(real maxDepth,
+                                   real volume,
+                                   real waterHeight,
+                                   real liquidDensity)
+        :
+        maxDepth(maxDepth), volume(volume),
+        waterHeight(waterHeight), liquidDensity(liquidDensity) {
+}
+
+void ParticleBuoyancy::updateForce(Particle *particle, real duration) {
+    // Calculate the submersion depth
+    real depth = particle->getPosition().y;
+
+    // Check if we're out of the water
+    if (depth >= waterHeight + maxDepth) return;
+    Vector3 force(0, 0, 0);
+
+    // Check if we're at maximum depth
+    if (depth <= waterHeight - maxDepth) {
+        force.y = liquidDensity * volume;
+        particle->addForce(force);
+        return;
+    }
+
+    // Otherwise we are partly submerged
+    force.y = liquidDensity * volume *
+              (depth - maxDepth - waterHeight) / (2 * maxDepth);
+    particle->addForce(force);
+}
+
+
+ParticleAnchoredSpring::ParticleAnchoredSpring() {
+}
+
+ParticleAnchoredSpring::ParticleAnchoredSpring(Vector3 *anchor,
+                                               real sc, real rl)
+        : anchor(anchor), springConstant(sc), restLength(rl) {
+}
+
+void ParticleAnchoredSpring::init(Vector3 *anchor, real springConstant,
+                                  real restLength) {
+    ParticleAnchoredSpring::anchor = anchor;
+    ParticleAnchoredSpring::springConstant = springConstant;
+    ParticleAnchoredSpring::restLength = restLength;
+}
+

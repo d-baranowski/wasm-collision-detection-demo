@@ -13,6 +13,9 @@
 #include "lib/physics/particle.h"
 #include "lib/physics/particle_force_registry.h"
 #include "lib/physics/particle_force_generator.h"
+#include "lib/physics/particle_world.h"
+#include "lib/physics/particle_contact_recolver.h"
+#include "lib/physics/particle_links.h"
 
 #define MAX_VELOCITY 2.0
 
