@@ -59,6 +59,12 @@ namespace cyclone {
 */
         real penetration;
 
+/**
+ * Holds the amount each particle is moved by during interpenetration
+ * resolution.
+ */
+        Vector3 particleMovement[2];
+
     protected:
 /**
 * Resolves this contact, for both velocity and interpenetration.

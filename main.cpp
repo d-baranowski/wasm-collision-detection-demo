@@ -165,7 +165,7 @@ void game_loop() {
 
 int main() {
     player_particle.setPosition(500, 500, 0);
-    player_particle.setMass(2);
+    player_particle.setMass(20);
     player_particle.setDamping(0.98);
 
     attached_particle.setPosition(200, 200, 0);
@@ -176,12 +176,14 @@ int main() {
     particleWorld.addParticle(&attached_particle);
 
     stifflerOne.setPosition(30, 30,0);
+    stifflerOne.setMass(15);
     stifflerTwo.setPosition(60,60, 0);
+    stifflerTwo.setMass(15);
 
-    //particleWorld.getForceRegistry().add(&attached_particle, &spring);
-    //particleWorld.getForceRegistry().add(&player_particle, &springTwo);
+    particleWorld.getForceRegistry().add(&attached_particle, &spring);
+    particleWorld.getForceRegistry().add(&player_particle, &springTwo);
 
-    //particleWorld.addContact(joinTwo);
+    particleWorld.addContact(joinTwo);
     particleWorld.addContact(joinOne);
 
     joinOne->particle[0] = &player_particle;
